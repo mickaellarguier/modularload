@@ -303,6 +303,76 @@ export default class {
                 container.setAttribute('data-' + this.toDash(key), val);
             });
         }
+
+        this.updateHeadElements();
+    }
+
+    updateHeadElements() {
+        const newHead = this.data.head;
+        const oldHead = document.head;
+
+        const newLinks = newHead.querySelectorAll('link[rel="stylesheet"]');
+        const oldLinks = oldHead.querySelectorAll('link[rel="stylesheet"]');
+        const newLinksSet = new Set([...newLinks].map(link => link.href));
+        const oldLinksSet = new Set([...oldLinks].map(link => link.href));
+
+        oldLinks.forEach(link => {
+            if (!newLinksSet.has(link.href)) {
+                link.remove();
+            }
+        });
+
+        const linkFragment = document.createDocumentFragment();
+        newLinks.forEach(newLink => {
+            if (!oldLinksSet.has(newLink.href)) {
+                linkFragment.appendChild(newLink.cloneNode(true));
+            }
+        });
+        oldHead.appendChild(linkFragment);
+
+        const newScripts = newHead.querySelectorAll('script');
+        const oldScripts = oldHead.querySelectorAll('script');
+        const newScriptsSet = new Set([...newScripts].map(script => script.src));
+        const oldScriptsSet = new Set([...oldScripts].map(script => script.src));
+
+        oldScripts.forEach(script => {
+            if (!newScriptsSet.has(script.src)) {
+                script.remove();
+            }
+        });
+
+        const scriptFragment = document.createDocumentFragment();
+        newScripts.forEach(newScript => {
+            if (!oldScriptsSet.has(newScript.src)) {
+                const scriptElement = document.createElement('script');
+                if (newScript.src) {
+                    scriptElement.src = newScript.src;
+                } else {
+                    scriptElement.textContent = newScript.textContent;
+                }
+                scriptFragment.appendChild(scriptElement);
+            }
+        });
+        oldHead.appendChild(scriptFragment);
+
+        const newStyles = newHead.querySelectorAll('style');
+        const oldStyles = oldHead.querySelectorAll('style');
+        const newStylesSet = new Set([...newStyles].map(style => style.innerHTML));
+        const oldStylesSet = new Set([...oldStyles].map(style => style.innerHTML));
+
+        oldStyles.forEach(style => {
+            if (!newStylesSet.has(style.innerHTML)) {
+                style.remove();
+            }
+        });
+
+        const styleFragment = document.createDocumentFragment();
+        newStyles.forEach(newStyle => {
+            if (!oldStylesSet.has(newStyle.innerHTML)) {
+                styleFragment.appendChild(newStyle.cloneNode(true));
+            }
+        });
+        oldHead.appendChild(styleFragment);
     }
 
     toDash(str) {
