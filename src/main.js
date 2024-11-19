@@ -14,7 +14,8 @@ export default class {
             isEntered: false,
             isUrl: false,
             transitionContainer: null,
-            popstateIgnore: false
+            popstateIgnore: false,
+            updateHead: true
         }
 
         Object.assign(this, this.defaults, options);
@@ -304,7 +305,9 @@ export default class {
             });
         }
 
-        this.updateHeadElements();
+        if (this.updateHead) {
+            this.updateHeadElements();
+        }
     }
 
     updateHeadElements() {
